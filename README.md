@@ -3,15 +3,16 @@ My own standard C++ Game Engine created on SDL3 applying classic game and
 programming patterns (Component/GameObject, Command, Observer, State, Flyweight, Service Locator, Dirty Flag, Singleton)
 
 ## Links to Projects created on the Game Engine:
-A recreation of the oldest version of Bomberman
-```
-https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
-```
 
-A Jump Point Search research project, comparing with A*
-```
+### A game recreation of retro Bomberman
+
+https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
+
+
+### A Jump Point Search research project, comparing with A*
+
 https://github.com/DAE-GD-2025-2026/gameai-research-project-DanielAdam13
-```
+
 
 ## Repository layout
  
