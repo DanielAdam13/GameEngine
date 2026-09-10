@@ -13,7 +13,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Image Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 3 };
+		static constexpr ComponentTypeID StaticTypeID{ 45 };
 
 		FPSComponent(GameObject* pOwnerPtr);
 		~FPSComponent() override = default;
@@ -33,7 +33,6 @@ namespace ge
 		static constexpr float ChangeInterval{ 0.25f };
 
 		// FPS Logic
-		
 		float m_FpsTimer{ 0.f };
 		int m_FrameCount{ 0 };
 		float m_CurrentFPS{ 0 };

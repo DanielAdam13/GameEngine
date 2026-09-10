@@ -10,9 +10,14 @@ namespace ge
 		virtual ~NullSoundSystem() override = default;
 
 		// Empty/Null Play implementation
-		virtual void Play(const Sound_Id, const float) override {};
-
+		virtual void Play(Sound_Id, float, SoundCategory) override {};
 		virtual void RegisterSound(ge::Sound_Id, const std::string&) override {};
+
+		virtual void Stop(Sound_Id) override {}
+		virtual void StopAll() override {}
+		virtual void SetMuted(bool) override {}
+		virtual bool IsMuted() const override { return false; }
+
 	private:
 
 	};

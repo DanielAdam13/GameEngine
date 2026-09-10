@@ -17,6 +17,7 @@ namespace ge
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
 
+		// Transfer ownership
 		void Add(std::unique_ptr<GameObject> object);
 		void Remove(const GameObject& object);
 		void RemoveAll();
@@ -42,7 +43,11 @@ namespace ge
 
 		std::string m_SceneName;
 
-		std::vector <std::unique_ptr<GameObject>> m_Objects{};
+		std::vector <std::unique_ptr<GameObject>> m_GameObjects;
+
+		// If we Add during runtime, the whole container will become invalid -> UB
+		// This is for reverse MarkForDeletion:
+		std::vector<std::unique_ptr<GameObject>> m_PendingAdditions; 
 
 		void CleanupDestroyedGameObjects();
 

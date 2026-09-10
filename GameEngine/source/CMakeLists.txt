@@ -12,9 +12,13 @@ add_library(gameEngine_lib STATIC
   "Scene.h" "Scene.cpp"
   "SceneManager.h" "SceneManager.cpp"
   "GameObject.h" "GameObject.cpp"
+  "Camera.h" "Camera.cpp"
   "ImGuiScene.h" "ImGuiScene.cpp"
-  "Observer.h"
+  "Observer.h" "Observer.cpp"
   "ObservableSubject.h" "ObservableSubject.cpp"
+  "ISelectable.h"
+  "ISelectableNavigator.h"
+
   "Services/ServiceLocator.h" "Services/ServiceLocator.cpp"
   "Services/SoundSystem.h" 
   "Services/NullSoundSystem.h"
@@ -30,21 +34,21 @@ add_library(gameEngine_lib STATIC
   "Components/ScoreComponent.h" "Components/ScoreComponent.cpp"
   "Components/Colliders.h" "Components/Colliders.cpp"
   "Components/AnimatorComponent.h" "Components/AnimatorComponent.cpp"
+  "Components/CameraFollowComponent.h" "Components/CameraFollowComponent.cpp" 
+  "Components/TimerDisplayComponent.h" "Components/TimerDisplayComponent.cpp"
 
   "Commands/Command.h"
   "Commands/GameObjectCommand.h"
   "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
-  #"Components/FSMComponent.h" "Components/FSMComponent.cpp"
   "Commands/ChangeWindowSizeCommand.h" "Commands/ChangeWindowSizeCommand.cpp"
-
-  "StateMachine/State.h" "StateMachine/State.cpp"
-  "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"
-
+  "Commands/MouseCommand.h" "Commands/MouseCommand.cpp"
+  
+  "Structs.h"
   "CollisionSystem.h" "CollisionSystem.cpp" 
   "EngineEvents.h" "IGameApplication.h"  
   
   "SpriteSheet.h" "SpriteSheet.cpp"
-  "Animation.h" "Commands/MouseCommand.h" "Commands/MouseCommand.cpp")
+  "Animation.h")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 
@@ -54,8 +58,8 @@ target_include_directories(gameEngine_lib PUBLIC
 
 # Dependencies — PUBLIC because public engine headers leak them into consumers
 target_link_libraries(gameEngine_lib PUBLIC
-  SDL3::SDL3
-  SDL3_ttf::SDL3_ttf
+  ${GAMEENGINE_SDL3_TARGET} # Computed in GameEngine/CMakeLists.txt already - this is portable
+  ${GAMEENGINE_SDL3_TTF_TARGET} # Computed in GameEngine/CMakeLists.txt already - this is portable
   glm::glm
   imgui
 )

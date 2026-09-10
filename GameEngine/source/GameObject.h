@@ -11,17 +11,17 @@
 
 namespace ge
 {
-	static constexpr size_t MAX_GO_COMPONENTS{ 40 };
+	static constexpr size_t MAX_GO_COMPONENTS{ 51 };
 
 	class GameObject final
 	{
 	public:
 		explicit GameObject(const std::string& name);
-		~GameObject();
-		GameObject(const GameObject& other) = delete;
-		GameObject(GameObject&& other) = delete;
-		GameObject& operator=(const GameObject& other) = delete;
-		GameObject& operator=(GameObject&& other) = delete;
+		~GameObject() = default;
+		GameObject(const GameObject&) = delete;
+		GameObject(GameObject&&) = delete;
+		GameObject& operator=(const GameObject&) = delete;
+		GameObject& operator=(GameObject&&) = delete;
 		
 		void FixedUpdate(float fixedTimeStep);
 		void Update(float deltaTime);
@@ -87,6 +87,8 @@ namespace ge
 		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
 		int GetChildrenCount() const;
 
+		void SetIgnoreCamera(bool ignoreFlag);
+
 	private:
 		Transform* m_pTransform; // Reference to the transform component
 
@@ -106,6 +108,8 @@ namespace ge
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
 		bool IsAncestor(const GameObject* obj) const;
+
+		bool m_IgnoresCamera{ false }; // Flag to separate UI from World GOs, world by default
 
 	};
 }

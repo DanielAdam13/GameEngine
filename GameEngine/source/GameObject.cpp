@@ -1,6 +1,8 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 
+#include "Renderer.h"
+
 using namespace ge;
 
 GameObject::GameObject(const std::string& name)
@@ -12,10 +14,6 @@ GameObject::GameObject(const std::string& name)
 {
 	AddComponent<Transform>(this);
 	m_pTransform = GetComponent<Transform>();
-}
-
-GameObject::~GameObject()
-{
 }
 
 void GameObject::FixedUpdate(float fixedTimeStep)
@@ -48,11 +46,26 @@ void GameObject::Update(float deltaTime)
 
 void GameObject::Render() const
 {
-	for (const auto& comp : m_Components)
+	if (m_IgnoresCamera)
 	{
-		if (comp && !comp->MarkedForDeletion())
+		Renderer::GetInstance().SuspendCamera();
+		for (const auto& comp : m_Components)
 		{
-			comp->RenderComponent();
+			if (comp && !comp->MarkedForDeletion())
+			{
+				comp->RenderComponent();
+			}
+		}
+		Renderer::GetInstance().RestoreCamera();
+	}
+	else
+	{
+		for (const auto& comp : m_Components)
+		{
+			if (comp && !comp->MarkedForDeletion())
+			{
+				comp->RenderComponent();
+			}
 		}
 	}
 }
@@ -167,6 +180,11 @@ int GameObject::GetChildrenCount() const
 			++count;
 	}
 	return count;
+}
+
+void ge::GameObject::SetIgnoreCamera(bool ignoreFlag)
+{
+	m_IgnoresCamera = ignoreFlag;
 }
 
 bool GameObject::ContainsChild(GameObject* parent) const

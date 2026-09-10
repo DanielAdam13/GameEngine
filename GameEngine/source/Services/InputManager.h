@@ -28,14 +28,13 @@ namespace ge
 		bool IsKeyDown(SDL_Scancode) const;
 
 		// Controller
-		bool IsButtonDownThisFrame(unsigned int button) const noexcept;
-		bool IsButtonUpThisFrame(unsigned int button) const noexcept;
-		bool IsButtonPressed(unsigned int button) const noexcept;
+		bool IsButtonDownThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept;
+		bool IsButtonUpThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept;
+		bool IsButtonPressed(unsigned int controllerIndex, unsigned int button) const noexcept;
 
-		glm::vec2 GetLeftStick() const;
-		glm::vec2 GetRightStick() const;
+		bool IsControllerConnected(unsigned int controllerIndex) const noexcept;
 
-		bool IsControllerConnected() const noexcept;
+		int GetControllerCount() const noexcept;
 
 		// Input Trigger should live here
 		enum class InputTrigger
@@ -52,17 +51,15 @@ namespace ge
 			Right = SDL_BUTTON_RIGHT,   // 3
 		};
 
-
 		void BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<Command> command);
-		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command);
-		void BindControllerStickCommand(std::unique_ptr<Command> command);
+		void BindControllerCommand(unsigned int controllerIndex,
+			unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command);
 		void BindMouseCommand(MouseButton button, std::unique_ptr<Command> command);
 
 		void UnbindAll();
 		void UnbindAllKeyboard();
 		void UnbindAllController();
 		void UnbindAllCommandsOfTarget(GameObject* target);
-		void UnbindAllMouse();
 
 	private:
 		// Acutal PIMPL implementation in .cpp

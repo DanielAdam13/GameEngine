@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "ObservableSubject.h"
 
 namespace ge
 {
@@ -9,7 +10,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every ScoreComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 6 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 44 };
 
 		ScoreComponent(ge::GameObject* pOwnerPtr, int startingScore);
 		virtual ~ScoreComponent() override = default;
@@ -21,11 +22,11 @@ namespace ge
 		void ChangeScore(int scoreDiff);
 		int GetCurrentScore() const noexcept;
 
-		void SetOnScoreChange(std::function<void()> callback);
+		Subject& GetOnScoreChangedEvent() noexcept { return m_OnScoreChangedEvent; };
 
 	private:
 		int m_CurrentScore{};
 
-		std::function<void()> m_OnScoreChange{};
+		Subject m_OnScoreChangedEvent;
 	};
 }
