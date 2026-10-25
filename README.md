@@ -11,17 +11,22 @@ A recreation of the retro game Bomberman, built using this engine:
 
 https://danieladam13.github.io/Prog4-GameEngine-Bomberman/
 
+![Gameplay gif](readme/BombGameplay.gif?raw=true "Bomb Gameplay") 
+
 Source Code
 
 https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
 
 The Bomberman project demonstrates how the engine can be reused to build an actual game, including player movement, bomb placement, explosions, enemy AI, powerups, level generation, menus and game-state transitions.
-
 The game uses the engine's GameObject / Component architecture, Command and Observer patterns, State Machines, collision system, resource manager and scene management.
 
 Another project built using the engine is a Jump Point Search research project comparing JPS with A*:
 
 https://github.com/DAE-GD-2025-2026/gameai-research-project-DanielAdam13
+
+The engine is also currently being used for my Bachelor Research on Gravitational Theory and Trajectory Design:
+
+https://github.com/DanielAdam13/GravityResearch
 
 ## Architecture
 
