@@ -37,6 +37,8 @@ This makes it easy to combine functionality without creating a deep inheritance 
 
 Component lookup uses compile-time type IDs and indexed storage, making GetComponent<T>() straightforward and avoiding the need to search through a list of Components.
 
+![Architecture image](readme/GOComp.jpg?raw=true "Game Engine Architecture") Game Object / Component architecrure
+
 ### Hierarchical Transforms / Dirty Flag
 
 The Transform Component supports parent-child relationships, allowing objects to inherit transformations from their parents.
@@ -55,6 +57,8 @@ Adding or removing objects during iteration can invalidate iterators and cause u
 
 This allows gameplay logic to create and destroy objects without directly modifying the collection being iterated over.
 
+![Architecture image](readme/UpdateObject.jpg?raw=true "Game Engine Architecture") Object in Scene / Update architecture
+
 ### Command / Observer
 
 Commands specify intent, Components implement behavior.
@@ -64,6 +68,8 @@ The Command pattern separates input handling from gameplay logic. The Input Mana
 The Observer pattern separates event sources from the systems reacting to them. A bomb explosion does not need to know what sound should play or which objects should be created. It simply notifies its Observers that the explosion happened.
 
 These patterns are used together in the Bomberman game to keep gameplay systems separate and extensible.
+
+![Architecture image](readme/CommandObserver.jpg?raw=true "Game Engine Architecture") Commands / Observer architecture
 
 ### Resource Management / Flyweight
 
