@@ -7,7 +7,7 @@ The engine is built around the idea that systems should have their own responsib
 
 ## Playable Result
 
-A recreation of the retro game Bomberman, built using this engine.
+A recreation of the retro game Bomberman, built using this engine:
 
 https://danieladam13.github.io/Prog4-GameEngine-Bomberman/
 
@@ -19,20 +19,20 @@ The Bomberman project demonstrates how the engine can be reused to build an actu
 
 The game uses the engine's GameObject / Component architecture, Command and Observer patterns, State Machines, collision system, resource manager and scene management.
 
-Another project built using the engine is a Jump Point Search research project comparing JPS with A*.
+Another project built using the engine is a Jump Point Search research project comparing JPS with A*:
 
 https://github.com/DAE-GD-2025-2026/gameai-research-project-DanielAdam13
 
 ## Architecture
+
+![Architecture image](readme/GameEngine.jpg?raw=true "Game Engine Architecture") Game Engine Architecture
 
 ## Technical Highlights
 
 ### GameObject / Component
 
 A Component is implemented "Not to reuse, but to be reused".
-
 A Game Object owns a container of Components, without allowing duplicates of a component type.
-
 This makes it easy to combine functionality without creating a deep inheritance hierarchy. A Game Object can have a Transform, Renderer-related Components, Colliders and gameplay-specific Components, all working together.
 
 Component lookup uses compile-time type IDs and indexed storage, making GetComponent<T>() straightforward and avoiding the need to search through a list of Components.
