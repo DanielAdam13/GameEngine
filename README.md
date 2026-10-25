@@ -1,17 +1,116 @@
 # MyGameEngine
-My own standard C++ Game Engine created on SDL3 applying classic game and 
-programming patterns (Component/GameObject, Command, Observer, State, Flyweight, Service Locator, Dirty Flag, Singleton)
+My own standard C++ Game Engine created on SDL3 applying classic game and programming patterns.
 
-## Links to Projects created on the Game Engine:
+The goal was to create a reusable game engine rather than simply a collection of rendering and input functions. The engine provides a foundation for building games, with a Game Object / Component architecture, scene management, rendering, collision detection, resource management, input handling and more.
 
-A game recreation of retro Bomberman
+The engine is built around the idea that systems should have their own responsibilities while remaining easy to combine. Components implement behavior, Commands specify intent, and the engine handles the underlying game loop and object lifecycle.
+
+## Playable Result
+
+A recreation of the retro game Bomberman, built using this engine.
+
+https://danieladam13.github.io/Prog4-GameEngine-Bomberman/
+
+Source Code
 
 https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
 
-A Jump Point Search research project, comparing with A*
+The Bomberman project demonstrates how the engine can be reused to build an actual game, including player movement, bomb placement, explosions, enemy AI, powerups, level generation, menus and game-state transitions.
+
+The game uses the engine's GameObject / Component architecture, Command and Observer patterns, State Machines, collision system, resource manager and scene management.
+
+Another project built using the engine is a Jump Point Search research project comparing JPS with A*.
 
 https://github.com/DAE-GD-2025-2026/gameai-research-project-DanielAdam13
 
+## Architecture
+
+## Technical Highlights
+
+### GameObject / Component
+
+A Component is implemented "Not to reuse, but to be reused".
+
+A Game Object owns a container of Components, without allowing duplicates of a component type.
+
+This makes it easy to combine functionality without creating a deep inheritance hierarchy. A Game Object can have a Transform, Renderer-related Components, Colliders and gameplay-specific Components, all working together.
+
+Component lookup uses compile-time type IDs and indexed storage, making GetComponent<T>() straightforward and avoiding the need to search through a list of Components.
+
+### Hierarchical Transforms / Dirty Flag
+
+The Transform Component supports parent-child relationships, allowing objects to inherit transformations from their parents.
+
+Local transformation matrices are combined with the parent's world matrix to calculate the final world transformation.
+
+The Dirty Flag pattern defers this calculation until the world matrix is requested. Changing a local position, rotation or scale marks the Transform as dirty, recursively invalidating its descendants as well.
+
+This avoids recalculating world matrices when nothing has changed.
+
+### Object Lifecycle / Update Method
+
+The Scene updates its Game Objects, which in turn update their Components.
+
+Adding or removing objects during iteration can invalidate iterators and cause undefined behavior. Instead, additions are stored as pending additions and removals are handled through a Mark For Delete mechanism.
+
+This allows gameplay logic to create and destroy objects without directly modifying the collection being iterated over.
+
+### Command / Observer
+
+Commands specify intent, Components implement behavior.
+
+The Command pattern separates input handling from gameplay logic. The Input Manager executes Commands, which can target individual Game Objects or perform game-wide actions.
+
+The Observer pattern separates event sources from the systems reacting to them. A bomb explosion does not need to know what sound should play or which objects should be created. It simply notifies its Observers that the explosion happened.
+
+These patterns are used together in the Bomberman game to keep gameplay systems separate and extensible.
+
+### Resource Management / Flyweight
+
+The ResourceManager provides a shared place of ownership and caching for textures, sprite sheets and fonts.
+
+Game Objects can reuse loaded resources rather than loading duplicate copies for every instance.
+
+Resources are managed through RAII, with std::unique_ptr handling ownership and non-owning references used where appropriate.
+
+### State Machines
+
+The engine provides the foundation for implementing State Machines, while the Bomberman game demonstrates their actual use.
+
+The game uses a Game State Machine to manage transitions between menus, gameplay and game-over states. Enemy AI uses separate States for behaviors such as wandering and chasing the player.
+State transitions are deferred and applied at a controlled point in the update loop.
+
+## Important Engine Decisions
+
+### Why Components instead of inheritance?
+
+Game Objects are composed from Components rather than requiring a separate subclass for every combination of behavior.
+
+This keeps functionality reusable and avoids deep inheritance hierarchies. It also makes cross-component communication convenient through GetComponent<T>().
+
+### Why defer object destruction and additions?
+
+Modifying a collection while iterating over it can invalidate iterators and references.
+
+Pending additions and deferred deletion provide a controlled point for modifying the Scene's Game Object collection, keeping the update loop safe.
+
+### Why use a fixed-size array for Components?
+
+Component types have unique type IDs that can be used as direct indices into the Game Object's Component container.
+
+This trades flexibility for straightforward, fast lookup. Since a Game Object cannot contain multiple Components of the same type, lookup is unambiguous.
+
+### Why cache resources?
+
+Textures, sprite sheets and fonts are often shared by many Game Objects.
+
+The ResourceManager owns these resources and reuses them, avoiding unnecessary duplicate loads and giving their lifetime a central owner.
+
+### Why Commands instead of putting gameplay logic in the Input Manager?
+
+The Input Manager should handle input, not understand the behavior of every game mechanic.
+
+Commands encapsulate actions and can be rebound or replaced without changing the input system. Components remain responsible for their own behavior, keeping the two abstractions separate.
 
 ## Repository layout
  
@@ -119,85 +218,14 @@ Load assets through
 Resources need real types. For example, `TextComponent` (and therefore `FPSComponent` etc.) requires a real `.ttf/.otf` file to be loadable at the path passed to `LoadFont`.
 
 
-# Specific Engine Pattern Decision
+## Github Actions
 
-### Component
+This project uses GitHub Actions to automate builds.
 
-    A Component is implemented "Not to reuse, but to be reused"
+CMake workflow - Builds Debug and Release configurations for Windows, checking that the project compiles on that platform.
 
-A Game Object OWNS a container of Components, not allowing any duplicates. The Game Object is the top-most level of abstraction in the game engine, it is the "main hub" for any methods/variables. Components, Commands, States all receive information via the Game Object target/owner. The feature of a Game Object not having any duplicate Components is very beneficial for a lot of reasons:
-- It makes cross-component lookup very CONVENIENT - you just call GetComponent<T> (where T is the component type) from anywhere and the user is sure that they are receiving only a singular instance, no overcomplication in the regard of wondering "which one".
-- Observers are all built on the assumption that only one Component of a type exists on a Game Object. If it didn't, the event logic would become entangled and complex.
-- State coherence - if a Game Object has multiple Health Components, what does that even mean?
+Emscripten workflow - Builds the web version and publishes it through GitHub Pages.
 
-### Command
+The published web version follows this URL format:
 
-    Specify intent, not behavior
-The Command Pattern is entirely separate from the Components. A Command will receive input and change values on the target Game Object but then a Component can do its own logic despite the command, making them, overall, a separate abstraction. The command's job is to encapsulate / "wrap" a function call and that's their main benefit. They do a very specific thing while being purely a call abstraction. 
-
-Implemented in a clean layered design:
-- Base abstraction (Command) -> allows Execute() overriding
-- Game Object targetting (GameObjectCommand) -> base for command targetting specific Game Objects. Stores a non-owning reference so commands can be rebound.
-- Game-flow commands (SwitchToMainMenuCommand...) -> act on game-wide state, override directly from base Command.
-- UI Commands (HoverSelectableCommand) -> delegate to methods on a state. All hover/selection logic lives on the state, not in the command.
-
-### Observer
-
-    Decopuling identity - a Subject notifies an Obsever in the same call stack as the event source
-Notifying that something has happened and not caring about who listens is a big deal in this project's architecture. 
-A bomb explosion does not care about what sound is played or what is created from it, it only tells the rest of the program that THIS has happened.
-
-### State
-
-    Abstract setup, teardown, "What's next" logic outside of the update loop. The machine is the dispatcher and applies pending transitions
-Engine fully supports utikizing State Machines:
-
-   - Create a Base State class
-   - Expose OnEnter and OnExit pure virtual methods
-   - Expose an OnUpdate method that returns a unique_ptr to the new state
-   - Create a separate State Machine class and store the new state 
-   returned from OnUpdate. From here you can apply the pending state switch pattern.
-
-
-### Update Method, Game Loop
-
-    Simulating a collection of objects, one frame at a time while caring about Destruction/Additiong mid-iteration
-This is basically the core loop of everything. 
-A Scene Manager is Updated once a frame -> Calls Update for every Scene -> Calls Update for every Game Object -> Calls Update for every Component.
-
-### Flyweight
-
-    The engine applies half of it - memory sharing between object instances, SDL handles shared state for performance
-The whole premise behind the ResourceManager is all resources having a shared place of ownership but MORE IMPORTANTLY - reusability and caching.
-Textures, Spite Sheets, Fonts all benefit greatly from this.
-
-### Dirty Flag
-
-    Deffering an expensive calculation - Transform
-The Transform's Component core idea - Marking Dirty ONLY when a recalculation is needed, not every frame. This means Setting the position, rotation or scale all 
-mark the flag and Getting them does the Recalculation. This applies recursively to every CHILD of a Game Object as well.
-
-### Singleton
-
-    Ensure a class has one instance and provide a global point of access to it
-Used in classes like ResourceManager, Renderer, GameEngine, the CollisionSystem. It is ok to expose these classes to every point since they are too high-level and would be
-annoying to pass as a parameter for every call site - this would become TOO tedious, 100+ places in my code so far.
-
-### Service Locator
-
-    Tries solving the singleton issue by providing a shared point of access to things that NEED one instance
-Applied for the Sound System and Input Manager. Initialized with a Null version until a derived service is assigned.
-
-### Type Object
-
-    Build a dynamic data-based object from a static class-based variation
-Insted of subclassing every variation, we expose one class for the live thing and another for what TYPE it is.
-Exact mapping in code:
-- Typed object: EnemyComponent (dynamic instance). Has health, position, state machine, movement...
-- Type object: EnemyArchetype (shared per-type data). SpriteSheet, speed, detection radius...
-
-### Subclass Sandbox
-
-    Providing a "sandbox" of available operations in a base class. Dervied classes reuse them.
-
-You can put reusable methods in the protected field on a base State class...
+https://<username>.github.io/<repository>/
